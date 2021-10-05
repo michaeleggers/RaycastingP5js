@@ -68,16 +68,24 @@ function raycast(pos, dir) {
   // current pos within tile
   let tilePos = createVector(pos.x % 32, pos.y % 32)
   
-  // first hitpoint
+  let dirX = Math.sign(dir.x)
+  let dirY = Math.sign(dir.y)
+
+  // first vertical hitpoint
   let dx = 32.0 - tilePos.x
   let dy = 32.0 - tilePos.y
-  let firstVerticalX = pos.x + dx
+  if (dirX === -1) dx = tilePos.x
+  if (dirY === -1) dy = tilePos.y
+  let firstVerticalX = pos.x + dirX*dx
   let m = dir.y / dir.x
-  let firstVerticalY = pos.y + m*dx
+  let firstVerticalY = pos.y + dirX*m*dx
   fill('orange')
   strokeWeight(0)
-  circle(firstVerticalX, firstVerticalY, 10)
-  circle(firstVerticalX + 32.0, firstVerticalY + m*32.0, 10)
+
+  // draw first and subsequent vertical hitpoints
+  for (let i=0; i<10; i++) {
+    circle(firstVerticalX + i*dirX*32.0, firstVerticalY + i*dirX*m*32.0, 10)
+  }
 }
 
 function setup() {
