@@ -79,12 +79,20 @@ function raycast(pos, dir) {
   let firstVerticalX = pos.x + dirX*dx
   let m = dir.y / dir.x
   let firstVerticalY = pos.y + dirX*m*dx
-  fill('orange')
-  strokeWeight(0)
 
+  // first horizontal hitpoint
+  let firstHorizontalY = pos.y + dirY*dy
+  let mHorizontal = dir.x / dir.y
+  let firstHorizontalX = pos.x + dirY*mHorizontal*dy
+
+  strokeWeight(0)
+  
   // draw first and subsequent vertical hitpoints
-  for (let i=0; i<10; i++) {
-    circle(firstVerticalX + i*dirX*32.0, firstVerticalY + i*dirX*m*32.0, 10)
+  for (let i=0; i<6; i++) {
+    fill('orange')
+    circle(firstVerticalX + i*dirX*32.0, firstVerticalY + i*dirX*m*32.0, 7)
+    fill('magenta')
+    circle(firstHorizontalX + i*dirX*32.0, firstHorizontalY + i*dirX*m*32.0, 7)
   }
 }
 
