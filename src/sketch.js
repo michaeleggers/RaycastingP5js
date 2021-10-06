@@ -165,21 +165,22 @@ function drawMap3D() {
   let xOffset = 320
   let i = 0
   let resX = 320
-  let steps = resX / 400
-  for (let a=-20.0; a < 20.0; a += 0.1) {
+  let steps = resX / 40
+  for (let a=-20.0; a < 20.0; a += 1) {
     let rDir = p5.Vector.rotate(dir, radians(a))
     rDir.normalize()
     let hit = raycast(player.pos, rDir)
     let depth = p5.Vector.sub(hit, player.pos).mag()
     console.log(depth)
-    depth = map(depth, 0.0, 1000.0, 0.0, 600.0)
+    depth = map(depth, 0.0, 1000.0, 0.0, 300.0)
     let vis = map(depth, 0.0, 200.0, 255, 0)
-    let slack = 600 - depth
+    let slack = Math.max(0.0, 300 - depth)
     let offsetY = slack/2.0
-    strokeWeight(steps)
-    strokeCap(SQUARE);
-    stroke(vis)
-    line(xOffset + i*steps, offsetY, xOffset + i*steps, depth)
+    strokeWeight(0)
+    // strokeCap(SQUARE);
+    // stroke(vis)
+    fill(vis)
+    rect(xOffset + i*steps, offsetY, steps, slack/2)
     i++
   }
 }
