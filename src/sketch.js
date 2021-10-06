@@ -64,15 +64,29 @@ function drawMap2D() {
   }
 }
 
+function screenspaceToTilespace(pos) {
+  // let tileX = pos.x / 32.0
+  // tileX = tileX - Math.floor(tileX)
+  // tileX *= 32.0
+  // let tileY = pos.y / 32.0
+  // tileY = tileY - Math.floor(tileY)
+  // tileY *= 32.0
+
+  return { x: pos.x % 32.0, y: pos.y % 32.0 }
+}
+
 // Converts a pixel position to a tilenumber
-function screenspaceToTilespace(screenX, screenY) {
-  return { x: Math.floor(screenX/32), y: Math.floor(screenY/32) }
+function screenspaceToTilenumber(pos) {
+  let tileX = Math.floor(pos.x / 32.0)
+  let tileY = Math.floor(pos.y / 32.0)
+
+  return { x: tileX, y: tileY }
 }
 
 function raycast(pos, dir) {
   // current pos within tile
-  let tilePos = createVector(pos.x % 32, pos.y % 32)
-  
+  let tilePos = screenspaceToTilespace(pos)
+
   let dirX = Math.sign(dir.x)
   let dirY = Math.sign(dir.y)
 
@@ -96,48 +110,54 @@ function raycast(pos, dir) {
 
   const MAX_RAY_LENGTH = 1000.0
   let closestHitpoint = createVector(0.0, 0.0)
+  let testTile = screenspaceToTilenumber(pos)
 
   // draw first and subsequent vertical hitpoints
   let i = 0
   while (p5.Vector.sub(closestHitpoint, pos).mag() < MAX_RAY_LENGTH) {
 
     strokeWeight(0)
-    
+    fill('orange')
+
     if (p5.Vector.sub(firstVerticalHitpoint, pos).mag() < p5.Vector.sub(firstHorizontalHitpoint, pos).mag()) {
-      fill('orange')
-      circle(firstVerticalHitpoint.x, firstVerticalHitpoint.y, 7)
-      text(i, firstVerticalHitpoint.x, firstVerticalHitpoint.y)
+      // fill('orange')
+      // circle(firstVerticalHitpoint.x, firstVerticalHitpoint.y, 7)
+      // text(i, firstVerticalHitpoint.x, firstVerticalHitpoint.y)
       closestHitpoint = createVector(firstVerticalHitpoint.x, firstVerticalHitpoint.y)
       firstVerticalHitpoint.x += dirX*32.0
       firstVerticalHitpoint.y += dirX*m*32.0
+      testTile.x += dirX
     }
     else {
-      fill('magenta')
-      circle(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y, 7)
-      text(i, firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
+      // fill('magenta')
+      // circle(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y, 7)
+      // text(i, firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
       closestHitpoint = createVector(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
       firstHorizontalHitpoint.x += dirY*mHorizontal*32.0
       firstHorizontalHitpoint.y += dirY*32.0
+      testTile.y += dirY
     }
 
-    fill('cyan')
-    circle(closestHitpoint.x, closestHitpoint.y, 4)
+    // fill('cyan')
+    // circle(closestHitpoint.x, closestHitpoint.y, 4)
 
     // check if wall is hit
-    let tile = screenspaceToTilespace(closestHitpoint.x, closestHitpoint.y)
-    console.log(closestHitpoint)
     
-    if (map[index(tile.x, tile.y)] === 'w') {
-      // console.log(currentRay)
+    if (map[index(testTile.x, testTile.y)] === 'w') {
       fill('red')
-      rect(32*tile.x % 320, 32*tile.y, 32, 32)
-      break
+      // rect(32*testTile.x % 320, 32*testTile.y, 32, 32)
+      return closestHitpoint
     }
+
+    // fill('cyan')
+    // text(i, closestHitpoint.x, closestHitpoint.y)
     
-    strokeWeight(1)
-    stroke('yellow')
+    // strokeWeight(1)
+    // stroke('yellow')
     i++
   }
+
+  return closestHitpoint
 }
 
 function setup() {
@@ -149,11 +169,34 @@ function setup() {
   player = new Player(createVector(110.0, 100.0), createVector(1.0, 1.0))
 }
 
+function debugRays() {
+  let dir = createVector(player.dir.x, player.dir.y).normalize()
+  let  i = 0
+  for (let a=-50.0; a < 50.0; a += 0.1) {
+    let rDir = p5.Vector.rotate(dir, radians(a))
+    rDir.normalize()
+    let hit = raycast(player.pos, rDir)
+    strokeWeight(1)
+    stroke('yellow')
+    line(player.pos.x, player.pos.y, hit.x, hit.y)
+    fill('cyan')
+    strokeWeight(0)
+    rect(hit.x-2.5, hit.y-2.5, 5, 5)
+    i++
+  }
+
+  // let hit = raycast(player.pos, dir)
+  // strokeWeight(1)
+  // stroke('yellow')
+  // line(player.pos.x, player.pos.y, hit.x, hit.y)
+}
+
 function draw() {
   background(0)
 
   updatePlayer()
   drawMap2D()
   player.draw()
-  raycast(player.pos, player.dir)
+  // raycast(player.pos, player.dir)
+  debugRays()
 }
