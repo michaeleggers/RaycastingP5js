@@ -5,8 +5,8 @@ const map = [
   'w', 'w', 'w', '_', '_', 'w', '_', '_', '_', 'w',
   'w', '_', '_', '_', '_', '_', '_', '_', '_', 'w',
   'w', '_', '_', '_', '_', 'w', '_', '_', '_', 'w',
-  'w', '_', '_', '_', '_', '_', '_', '_', '_', 'w',
-  'w', '_', '_', '_', '_', '_', '_', '_', '_', 'w',
+  'w', '_', 'w', '_', '_', '_', '_', '_', 'w', 'w',
+  'w', '_', '_', 'w', '_', '_', 'w', '_', '_', 'w',
   'w', '_', '_', '_', '_', '_', '_', '_', '_', 'w',
   'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', '_', 'w'
 ]
@@ -65,13 +65,6 @@ function drawMap2D() {
 }
 
 function screenspaceToTilespace(pos) {
-  // let tileX = pos.x / 32.0
-  // tileX = tileX - Math.floor(tileX)
-  // tileX *= 32.0
-  // let tileY = pos.y / 32.0
-  // tileY = tileY - Math.floor(tileY)
-  // tileY *= 32.0
-
   return { x: pos.x % 32.0, y: pos.y % 32.0 }
 }
 
@@ -98,63 +91,43 @@ function raycast(pos, dir) {
   
   // first vertical hitpoint
   let firstVerticalX = pos.x + dirX*dx
-  let m = dir.y / dir.x
-  let firstVerticalY = pos.y + dirX*m*dx
-  let firstVerticalHitpoint = createVector(firstVerticalX, firstVerticalY)
+  let slopeX = dir.y / dir.x
+  let firstVerticalY = pos.y + dirX*slopeX*dx
+  let verticalHitpoint = createVector(firstVerticalX, firstVerticalY)
 
   // first horizontal hitpoint
   let firstHorizontalY = pos.y + dirY*dy
-  let mHorizontal = dir.x / dir.y
-  let firstHorizontalX = pos.x + dirY*mHorizontal*dy
-  let firstHorizontalHitpoint = createVector(firstHorizontalX, firstHorizontalY)
+  let slopeY = dir.x / dir.y
+  let firstHorizontalX = pos.x + dirY*slopeY*dy
+  let horizontalHitpoint = createVector(firstHorizontalX, firstHorizontalY)
 
   const MAX_RAY_LENGTH = 1000.0
   let closestHitpoint = createVector(0.0, 0.0)
   let testTile = screenspaceToTilenumber(pos)
 
   // draw first and subsequent vertical hitpoints
-  let i = 0
   while (p5.Vector.sub(closestHitpoint, pos).mag() < MAX_RAY_LENGTH) {
 
     strokeWeight(0)
     fill('orange')
 
-    if (p5.Vector.sub(firstVerticalHitpoint, pos).mag() < p5.Vector.sub(firstHorizontalHitpoint, pos).mag()) {
-      // fill('orange')
-      // circle(firstVerticalHitpoint.x, firstVerticalHitpoint.y, 7)
-      // text(i, firstVerticalHitpoint.x, firstVerticalHitpoint.y)
-      closestHitpoint = createVector(firstVerticalHitpoint.x, firstVerticalHitpoint.y)
-      firstVerticalHitpoint.x += dirX*32.0
-      firstVerticalHitpoint.y += dirX*m*32.0
+    if (p5.Vector.sub(verticalHitpoint, pos).mag() < p5.Vector.sub(horizontalHitpoint, pos).mag()) {
+      closestHitpoint = createVector(verticalHitpoint.x, verticalHitpoint.y)
+      verticalHitpoint.x += dirX*32.0
+      verticalHitpoint.y += dirX*slopeX*32.0
       testTile.x += dirX
     }
     else {
-      // fill('magenta')
-      // circle(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y, 7)
-      // text(i, firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
-      closestHitpoint = createVector(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
-      firstHorizontalHitpoint.x += dirY*mHorizontal*32.0
-      firstHorizontalHitpoint.y += dirY*32.0
+      closestHitpoint = createVector(horizontalHitpoint.x, horizontalHitpoint.y)
+      horizontalHitpoint.x += dirY*slopeY*32.0
+      horizontalHitpoint.y += dirY*32.0
       testTile.y += dirY
     }
 
-    // fill('cyan')
-    // circle(closestHitpoint.x, closestHitpoint.y, 4)
-
     // check if wall is hit
-    
     if (map[index(testTile.x, testTile.y)] === 'w') {
-      fill('red')
-      // rect(32*testTile.x % 320, 32*testTile.y, 32, 32)
       return closestHitpoint
     }
-
-    // fill('cyan')
-    // text(i, closestHitpoint.x, closestHitpoint.y)
-    
-    // strokeWeight(1)
-    // stroke('yellow')
-    i++
   }
 
   return closestHitpoint
@@ -172,7 +145,7 @@ function setup() {
 function debugRays() {
   let dir = createVector(player.dir.x, player.dir.y).normalize()
   let  i = 0
-  for (let a=-50.0; a < 50.0; a += 0.1) {
+  for (let a=-50.0; a < 50.0; a += 2) {
     let rDir = p5.Vector.rotate(dir, radians(a))
     rDir.normalize()
     let hit = raycast(player.pos, rDir)
@@ -184,11 +157,6 @@ function debugRays() {
     rect(hit.x-2.5, hit.y-2.5, 5, 5)
     i++
   }
-
-  // let hit = raycast(player.pos, dir)
-  // strokeWeight(1)
-  // stroke('yellow')
-  // line(player.pos.x, player.pos.y, hit.x, hit.y)
 }
 
 function draw() {
