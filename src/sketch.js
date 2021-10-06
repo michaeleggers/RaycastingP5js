@@ -14,7 +14,7 @@ const map = [
 class Player {
   constructor(pos, dir) {
     this.pos = pos
-    this.dir = dir
+    this.dir = p5.Vector.normalize(dir)
   }
 
   draw() {
@@ -22,7 +22,7 @@ class Player {
     circle(this.pos.x, this.pos.y, 10)
     stroke('red')
     strokeWeight(3)
-    line(this.pos.x, this.pos.y, this.pos.x + 100*this.dir.x, this.pos.y + 100*this.dir.y)
+    line(this.pos.x, this.pos.y, this.pos.x + 20*this.dir.x, this.pos.y + 20*this.dir.y)
   }
 }
 
@@ -71,28 +71,52 @@ function raycast(pos, dir) {
   let dirX = Math.sign(dir.x)
   let dirY = Math.sign(dir.y)
 
-  // first vertical hitpoint
+  // distance from pos within tile to next tile in ray's direction
   let dx = 32.0 - tilePos.x
   let dy = 32.0 - tilePos.y
   if (dirX === -1) dx = tilePos.x
   if (dirY === -1) dy = tilePos.y
+  
+  // first vertical hitpoint
   let firstVerticalX = pos.x + dirX*dx
   let m = dir.y / dir.x
   let firstVerticalY = pos.y + dirX*m*dx
+  let firstVerticalHitpoint = createVector(firstVerticalX, firstVerticalY)
 
   // first horizontal hitpoint
   let firstHorizontalY = pos.y + dirY*dy
   let mHorizontal = dir.x / dir.y
   let firstHorizontalX = pos.x + dirY*mHorizontal*dy
+  let firstHorizontalHitpoint = createVector(firstHorizontalX, firstHorizontalY)
 
-  strokeWeight(0)
+  const MAX_RAY_LENGTH = 1000.0
+  let currentLength = 0.0
+  
   
   // draw first and subsequent vertical hitpoints
-  for (let i=0; i<6; i++) {
-    fill('orange')
-    circle(firstVerticalX + i*dirX*32.0, firstVerticalY + i*dirX*m*32.0, 7)
-    fill('magenta')
-    circle(firstHorizontalX + i*dirX*32.0, firstHorizontalY + i*dirX*m*32.0, 7)
+  let i = 0
+  while (currentLength < MAX_RAY_LENGTH) {
+    console.log(currentLength)
+    strokeWeight(0)
+    if (firstVerticalHitpoint.mag() < firstHorizontalHitpoint.mag()) {
+      fill('orange')
+      circle(firstVerticalHitpoint.x, firstVerticalHitpoint.y, 7)
+      text(i, firstVerticalHitpoint.x, firstVerticalHitpoint.y)
+      firstVerticalHitpoint.x += dirX*32.0
+      firstVerticalHitpoint.y += dirX*m*32.0
+      currentLength = firstVerticalHitpoint.mag()
+    }
+    else {
+      fill('magenta')
+      circle(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y, 7)
+      text(i, firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
+      firstHorizontalHitpoint.x += dirY*mHorizontal*32.0
+      firstHorizontalHitpoint.y += dirY*32.0
+      currentLength = firstHorizontalHitpoint.mag()
+    }
+    strokeWeight(1)
+    stroke('yellow')
+    i++
   }
 }
 
@@ -102,7 +126,7 @@ function setup() {
 
   createCanvas(640, 600)
 
-  player = new Player(createVector(110.0, 100.0), createVector(1.0, 0.0))
+  player = new Player(createVector(110.0, 100.0), createVector(1.0, 1.0))
 }
 
 function draw() {
