@@ -90,21 +90,20 @@ function raycast(pos, dir) {
   let firstHorizontalHitpoint = createVector(firstHorizontalX, firstHorizontalY)
 
   const MAX_RAY_LENGTH = 1000.0
-  let currentLength = 0.0
+  let currentRay = createVector(0.0, 0.0)
   
   
   // draw first and subsequent vertical hitpoints
   let i = 0
-  while (currentLength < MAX_RAY_LENGTH) {
-    console.log(currentLength)
+  while (currentRay.mag() < MAX_RAY_LENGTH) {
     strokeWeight(0)
-    if (firstVerticalHitpoint.mag() < firstHorizontalHitpoint.mag()) {
+    if (p5.Vector.sub(firstVerticalHitpoint, pos).mag() < p5.Vector.sub(firstHorizontalHitpoint, pos).mag()) {
       fill('orange')
       circle(firstVerticalHitpoint.x, firstVerticalHitpoint.y, 7)
       text(i, firstVerticalHitpoint.x, firstVerticalHitpoint.y)
       firstVerticalHitpoint.x += dirX*32.0
       firstVerticalHitpoint.y += dirX*m*32.0
-      currentLength = firstVerticalHitpoint.mag()
+      currentRay = p5.Vector.sub(firstVerticalHitpoint, pos)
     }
     else {
       fill('magenta')
@@ -112,7 +111,7 @@ function raycast(pos, dir) {
       text(i, firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
       firstHorizontalHitpoint.x += dirY*mHorizontal*32.0
       firstHorizontalHitpoint.y += dirY*32.0
-      currentLength = firstHorizontalHitpoint.mag()
+      currentRay = p5.Vector.sub(firstHorizontalHitpoint, pos)
     }
     strokeWeight(1)
     stroke('yellow')
