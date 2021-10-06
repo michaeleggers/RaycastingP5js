@@ -1,3 +1,6 @@
+const MAP_X = 10
+const MAP_Y = 10
+const TILE_SIZE = 32.0
 const map = [
   'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w',
   'w', '_', '_', '_', '_', 'w', '_', '_', '_', 'w',
@@ -48,8 +51,8 @@ function updatePlayer() {
 }
 
 function drawMap2D() {
-  for (let y=0; y<10; y++) {
-    for (let x=0; x<10; x++) {
+  for (let y=0; y<MAP_Y; y++) {
+    for (let x=0; x<MAP_X; x++) {
       let tile = map[index(x, y)]
       if (tile === 'w') {
         fill(255)
@@ -59,19 +62,19 @@ function drawMap2D() {
       }
       stroke('black')
       strokeWeight(1)
-      rect(32*x % 320, 32*y, 32, 32)
+      rect(TILE_SIZE*x % (TILE_SIZE*MAP_X), TILE_SIZE*y, TILE_SIZE, TILE_SIZE)
     }
   }
 }
 
 function screenspaceToTilespace(pos) {
-  return { x: pos.x % 32.0, y: pos.y % 32.0 }
+  return { x: pos.x % TILE_SIZE, y: pos.y % TILE_SIZE }
 }
 
 // Converts a pixel position to a tilenumber
 function screenspaceToTilenumber(pos) {
-  let tileX = Math.floor(pos.x / 32.0)
-  let tileY = Math.floor(pos.y / 32.0)
+  let tileX = Math.floor(pos.x / TILE_SIZE)
+  let tileY = Math.floor(pos.y / TILE_SIZE)
 
   return { x: tileX, y: tileY }
 }
@@ -84,8 +87,8 @@ function raycast(pos, dir) {
   let dirY = Math.sign(dir.y)
 
   // distance from pos within tile to next tile in ray's direction
-  let dx = 32.0 - tilePos.x
-  let dy = 32.0 - tilePos.y
+  let dx = TILE_SIZE - tilePos.x
+  let dy = TILE_SIZE - tilePos.y
   if (dirX === -1) dx = tilePos.x
   if (dirY === -1) dy = tilePos.y
   
@@ -113,14 +116,14 @@ function raycast(pos, dir) {
 
     if (p5.Vector.sub(verticalHitpoint, pos).mag() < p5.Vector.sub(horizontalHitpoint, pos).mag()) {
       closestHitpoint = createVector(verticalHitpoint.x, verticalHitpoint.y)
-      verticalHitpoint.x += dirX*32.0
-      verticalHitpoint.y += dirX*slopeX*32.0
+      verticalHitpoint.x += dirX*TILE_SIZE
+      verticalHitpoint.y += dirX*slopeX*TILE_SIZE
       testTile.x += dirX
     }
     else {
       closestHitpoint = createVector(horizontalHitpoint.x, horizontalHitpoint.y)
-      horizontalHitpoint.x += dirY*slopeY*32.0
-      horizontalHitpoint.y += dirY*32.0
+      horizontalHitpoint.x += dirY*slopeY*TILE_SIZE
+      horizontalHitpoint.y += dirY*TILE_SIZE
       testTile.y += dirY
     }
 
@@ -144,7 +147,6 @@ function setup() {
 
 function debugRays() {
   let dir = createVector(player.dir.x, player.dir.y).normalize()
-  let  i = 0
   for (let a=-50.0; a < 50.0; a += 2) {
     let rDir = p5.Vector.rotate(dir, radians(a))
     rDir.normalize()
@@ -155,7 +157,6 @@ function debugRays() {
     fill('cyan')
     strokeWeight(0)
     rect(hit.x-2.5, hit.y-2.5, 5, 5)
-    i++
   }
 }
 
@@ -164,7 +165,7 @@ function draw() {
 
   updatePlayer()
   drawMap2D()
-  player.draw()
   // raycast(player.pos, player.dir)
   debugRays()
+  player.draw()
 }
