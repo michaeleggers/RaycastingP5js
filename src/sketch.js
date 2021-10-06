@@ -64,6 +64,11 @@ function drawMap2D() {
   }
 }
 
+// Converts a pixel position to a tilenumber
+function screenspaceToTilespace(screenX, screenY) {
+  return { x: Math.floor(screenX/32), y: Math.floor(screenY/32) }
+}
+
 function raycast(pos, dir) {
   // current pos within tile
   let tilePos = createVector(pos.x % 32, pos.y % 32)
@@ -90,29 +95,45 @@ function raycast(pos, dir) {
   let firstHorizontalHitpoint = createVector(firstHorizontalX, firstHorizontalY)
 
   const MAX_RAY_LENGTH = 1000.0
-  let currentRay = createVector(0.0, 0.0)
-  
-  
+  let closestHitpoint = createVector(0.0, 0.0)
+
   // draw first and subsequent vertical hitpoints
   let i = 0
-  while (currentRay.mag() < MAX_RAY_LENGTH) {
+  while (p5.Vector.sub(closestHitpoint, pos).mag() < MAX_RAY_LENGTH) {
+
     strokeWeight(0)
+    
     if (p5.Vector.sub(firstVerticalHitpoint, pos).mag() < p5.Vector.sub(firstHorizontalHitpoint, pos).mag()) {
       fill('orange')
       circle(firstVerticalHitpoint.x, firstVerticalHitpoint.y, 7)
       text(i, firstVerticalHitpoint.x, firstVerticalHitpoint.y)
+      closestHitpoint = createVector(firstVerticalHitpoint.x, firstVerticalHitpoint.y)
       firstVerticalHitpoint.x += dirX*32.0
       firstVerticalHitpoint.y += dirX*m*32.0
-      currentRay = p5.Vector.sub(firstVerticalHitpoint, pos)
     }
     else {
       fill('magenta')
       circle(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y, 7)
       text(i, firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
+      closestHitpoint = createVector(firstHorizontalHitpoint.x, firstHorizontalHitpoint.y)
       firstHorizontalHitpoint.x += dirY*mHorizontal*32.0
       firstHorizontalHitpoint.y += dirY*32.0
-      currentRay = p5.Vector.sub(firstHorizontalHitpoint, pos)
     }
+
+    fill('cyan')
+    circle(closestHitpoint.x, closestHitpoint.y, 4)
+
+    // check if wall is hit
+    let tile = screenspaceToTilespace(closestHitpoint.x, closestHitpoint.y)
+    console.log(closestHitpoint)
+    
+    if (map[index(tile.x, tile.y)] === 'w') {
+      // console.log(currentRay)
+      fill('red')
+      rect(32*tile.x % 320, 32*tile.y, 32, 32)
+      break
+    }
+    
     strokeWeight(1)
     stroke('yellow')
     i++
