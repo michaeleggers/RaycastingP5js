@@ -1,7 +1,7 @@
 const MAP_X = 10
 const MAP_Y = 10
 const TILE_SIZE = 32.0
-const map = [
+const GAME_MAP = [
   'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w',
   'w', '_', '_', '_', '_', 'w', '_', '_', '_', 'w',
   'w', '_', '_', '_', '_', 'w', '_', '_', '_', 'w',
@@ -53,7 +53,7 @@ function updatePlayer() {
 function drawMap2D() {
   for (let y=0; y<MAP_Y; y++) {
     for (let x=0; x<MAP_X; x++) {
-      let tile = map[index(x, y)]
+      let tile = GAME_MAP[index(x, y)]
       if (tile === 'w') {
         fill(255)
       }
@@ -128,7 +128,7 @@ function raycast(pos, dir) {
     }
 
     // check if wall is hit
-    if (map[index(testTile.x, testTile.y)] === 'w') {
+    if (GAME_MAP[index(testTile.x, testTile.y)] === 'w') {
       return closestHitpoint
     }
   }
@@ -160,6 +160,30 @@ function debugRays() {
   }
 }
 
+function drawMap3D() {
+  let dir = createVector(player.dir.x, player.dir.y).normalize()
+  let xOffset = 320
+  let i = 0
+  let resX = 320
+  let steps = resX / 400
+  for (let a=-20.0; a < 20.0; a += 0.1) {
+    let rDir = p5.Vector.rotate(dir, radians(a))
+    rDir.normalize()
+    let hit = raycast(player.pos, rDir)
+    let depth = p5.Vector.sub(hit, player.pos).mag()
+    console.log(depth)
+    depth = map(depth, 0.0, 1000.0, 0.0, 600.0)
+    let vis = map(depth, 0.0, 200.0, 255, 0)
+    let slack = 600 - depth
+    let offsetY = slack/2.0
+    strokeWeight(steps)
+    strokeCap(SQUARE);
+    stroke(vis)
+    line(xOffset + i*steps, offsetY, xOffset + i*steps, depth)
+    i++
+  }
+}
+
 function draw() {
   background(0)
 
@@ -168,4 +192,6 @@ function draw() {
   // raycast(player.pos, player.dir)
   debugRays()
   player.draw()
+
+  drawMap3D()
 }
