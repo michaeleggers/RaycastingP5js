@@ -165,8 +165,8 @@ function drawMap3D() {
   let xOffset = 320
   let i = 0
   let resX = 320
-  let steps = resX / 40
-  for (let a=-20.0; a < 20.0; a += 1) {
+  let steps = resX / 80
+  for (let a=-40.0; a < 40.0; a += 1) {
     let rDir = p5.Vector.rotate(dir, radians(a))
     rDir.normalize()
     let hit = raycast(player.pos, rDir)
@@ -181,6 +181,14 @@ function drawMap3D() {
     // stroke(vis)
     fill(vis)
     rect(xOffset + i*steps, offsetY, steps, slack/2)
+
+    strokeWeight(1)
+    stroke('yellow')
+    line(player.pos.x, player.pos.y, hit.x, hit.y)
+    fill('cyan')
+    strokeWeight(0)
+    rect(hit.x-2.5, hit.y-2.5, 5, 5)
+
     i++
   }
 }
@@ -191,7 +199,7 @@ function draw() {
   updatePlayer()
   drawMap2D()
   // raycast(player.pos, player.dir)
-  debugRays()
+  // debugRays()
   player.draw()
 
   drawMap3D()
