@@ -203,4 +203,5 @@ function draw() {
   player.draw()
 
   drawMap3D()
+  
 }
