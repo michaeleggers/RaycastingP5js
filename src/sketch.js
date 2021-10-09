@@ -165,23 +165,29 @@ function drawMap3D() {
   let xOffset = 320
   let i = 0
   let resX = 320
-  let steps = resX / 80
-  for (let a=-40.0; a < 40.0; a += 1) {
-    let rDir = p5.Vector.rotate(dir, radians(a))
+  let resY = 300
+  let fov = 100
+  let stepSize = 1
+  let colWidth = resX / (fov / stepSize)
+  for (let a = 0; a < fov; a += stepSize) {
+    let rDir = p5.Vector.rotate(dir, radians(-fov/2.0 + a))
     rDir.normalize()
     let hit = raycast(player.pos, rDir)
     let depth = p5.Vector.sub(hit, player.pos).mag()
-    console.log(depth)
-    depth = map(depth, 0.0, 1000.0, 0.0, 300.0)
-    let vis = map(depth, 0.0, 200.0, 255, 0)
-    let slack = Math.max(0.0, 300 - depth)
+    // console.log('depth: ' + depth)
+    depth = map(depth, 0.0, 1000.0, resY, 0)
+    // console.log('mapped depth: ' + depth)
+    let vis = map(depth, 0, resY, 0, 255)
+    let slack = Math.max(0.0, resY - depth)
     let offsetY = slack/2.0
-    strokeWeight(0)
-    // strokeCap(SQUARE);
-    // stroke(vis)
-    fill(vis)
-    rect(xOffset + i*steps, offsetY, steps, slack/2)
 
+    // Draw 3D world
+    strokeWeight(1)
+    stroke(vis)
+    fill(vis)
+    rect(xOffset + i*colWidth, offsetY, colWidth, depth)
+
+    // Debug Rays
     strokeWeight(1)
     stroke('yellow')
     line(player.pos.x, player.pos.y, hit.x, hit.y)
@@ -189,6 +195,7 @@ function drawMap3D() {
     strokeWeight(0)
     rect(hit.x-2.5, hit.y-2.5, 5, 5)
 
+    
     i++
   }
 }
