@@ -145,21 +145,6 @@ function setup() {
   player = new Player(createVector(110.0, 100.0), createVector(1.0, 1.0))
 }
 
-function debugRays() {
-  let dir = createVector(player.dir.x, player.dir.y).normalize()
-  for (let a=-50.0; a < 50.0; a += 2) {
-    let rDir = p5.Vector.rotate(dir, radians(a))
-    rDir.normalize()
-    let hit = raycast(player.pos, rDir)
-    strokeWeight(1)
-    stroke('yellow')
-    line(player.pos.x, player.pos.y, hit.x, hit.y)
-    fill('cyan')
-    strokeWeight(0)
-    rect(hit.x-2.5, hit.y-2.5, 5, 5)
-  }
-}
-
 function drawMap3D() {
   let dir = createVector(player.dir.x, player.dir.y).normalize()
   let xOffset = 320
@@ -204,12 +189,16 @@ function draw() {
   background(0)
 
   updatePlayer()
-  drawMap2D()
-  // raycast(player.pos, player.dir)
-  // debugRays()
-  player.draw()
 
+  drawMap2D()
+  player.draw()
   drawMap3D()
+
+  // Draw 3D View boundaries
+  noFill()
+  strokeWeight(1)
+  stroke('red')
+  rect(320, 0, 640, 300)
 
   
 }
