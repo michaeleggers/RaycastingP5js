@@ -149,13 +149,12 @@ function setup() {
   player = new Player(createVector(110.0, 100.0), createVector(1.0, 1.0))
 }
 
-function drawMap3D() {
+function drawMap3D(samples) {
   let dir = createVector(player.dir.x, player.dir.y).normalize()
   let xOffset = 320
   let resX = 320
   let resY = 300
   let fov = 100
-  let samples = 1
   let colWidth = resX / samples
   let angleStep = fov / samples
   for (let i = 0; i < samples; i++) {
@@ -192,8 +191,8 @@ function draw() {
   updatePlayer()
 
   drawMap2D()
+  drawMap3D(50)
   player.draw()
-  drawMap3D()
 
   // Draw 3D View boundaries
   noFill()
