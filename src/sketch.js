@@ -154,26 +154,28 @@ function drawMap3D(samples) {
   let xOffset = 320
   let resX = 320
   let resY = 300
-  let fov = 100
+  let fov = 60
   let colWidth = resX / samples
   let angleStep = fov / samples
   for (let i = 0; i < samples; i++) {
     let rDir = p5.Vector.rotate(dir, radians(-samples/2.0*angleStep + i*angleStep))
-    rDir.normalize()
+    let beta = dir.angleBetween(rDir)
     let hit = raycast(player.pos, rDir)
     let depth = p5.Vector.sub(hit, player.pos).mag()
+    let correctedDepth = depth * Math.cos(beta)
     // console.log('depth: ' + depth)
-    depth = map(depth, 0.0, 300.0, resY, 0)
+    let sliceHeight = map(correctedDepth, 0.0, 300.0, resY, 0)
+    let projSliceheight  = sliceHeight / correctedDepth * 40.0
     // console.log('mapped depth: ' + depth)
-    let vis = map(depth, 0, resY, 0, 255)
-    let slack = Math.max(0.0, resY - depth)
+    let vis = map(sliceHeight, 0, resY, 0, 255)
+    let slack = Math.max(0.0, resY - projSliceheight)
     let offsetY = slack/2.0
 
     // Draw 3D world
     strokeWeight(0)
     stroke(vis)
     fill(vis)
-    rect(xOffset + i*colWidth, offsetY, colWidth, depth)
+    rect(xOffset + i*colWidth, offsetY, colWidth, projSliceheight)
 
     // Debug Rays
     strokeWeight(1)
@@ -191,7 +193,7 @@ function draw() {
   updatePlayer()
 
   drawMap2D()
-  drawMap3D(20)
+  drawMap3D(320)
   player.draw()
 
   // Draw 3D View boundaries
