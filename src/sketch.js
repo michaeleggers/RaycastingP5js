@@ -86,12 +86,16 @@ function raycast(pos, dir) {
   let dirX = Math.sign(dir.x)
   let dirY = Math.sign(dir.y)
 
+  // console.log('made it here 1')
+
   // distance from pos within tile to next tile in ray's direction
   let dx = TILE_SIZE - tilePos.x
   let dy = TILE_SIZE - tilePos.y
   if (dirX === -1) dx = tilePos.x
   if (dirY === -1) dy = tilePos.y
   
+  // console.log('made it here 2')
+
   // first vertical hitpoint
   let firstVerticalX = pos.x + dirX*dx
   let slopeX = dir.y / dir.x
@@ -148,14 +152,14 @@ function setup() {
 function drawMap3D() {
   let dir = createVector(player.dir.x, player.dir.y).normalize()
   let xOffset = 320
-  let i = 0
   let resX = 320
   let resY = 300
   let fov = 100
-  let stepSize = 1
-  let colWidth = resX / (fov / stepSize)
-  for (let a = 0; a < fov; a += stepSize) {
-    let rDir = p5.Vector.rotate(dir, radians(-fov/2.0 + a))
+  let samples = 1
+  let colWidth = resX / samples
+  let angleStep = fov / samples
+  for (let i = 0; i < samples; i++) {
+    let rDir = p5.Vector.rotate(dir, radians(-samples/2.0*angleStep + i*angleStep))
     rDir.normalize()
     let hit = raycast(player.pos, rDir)
     let depth = p5.Vector.sub(hit, player.pos).mag()
@@ -179,9 +183,6 @@ function drawMap3D() {
     fill('cyan')
     strokeWeight(0)
     rect(hit.x-2.5, hit.y-2.5, 5, 5)
-
-    
-    i++
   }
 }
 
