@@ -3,15 +3,15 @@ const MAP_Y = 10
 const TILE_SIZE = 32.0
 const GAME_MAP = [
   'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w',
-  'w', '_', '_', '_', '_', 'w', '_', '_', '_', 'w',
-  'w', '_', '_', '_', '_', 'w', '_', '_', '_', 'w',
-  'w', 'w', 'w', '_', '_', 'w', '_', '_', '_', 'w',
+  'w', '_', '_', '_', 'w', '_', '_', '_', '_', 'w',
+  'w', '_', '_', '_', 'w', '_', '_', '_', '_', 'w',
+  'w', '_', '_', '_', 'w', '_', '_', '_', '_', 'w',
+  'w', '_', '_', '_', 'w', '_', '_', '_', '_', 'w',
+  'w', '_', 'w', 'w', 'w', '_', '_', '_', '_', 'w',
   'w', '_', '_', '_', '_', '_', '_', '_', '_', 'w',
-  'w', '_', '_', '_', '_', 'w', '_', '_', '_', 'w',
-  'w', '_', 'w', '_', '_', '_', '_', '_', 'w', 'w',
-  'w', '_', '_', 'w', '_', '_', 'w', '_', '_', 'w',
   'w', '_', '_', '_', '_', '_', '_', '_', '_', 'w',
-  'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', '_', 'w'
+  'w', '_', '_', '_', '_', '_', '_', '_', '_', 'w',
+  'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w', 'w'
 ]
 
 class Player {
@@ -155,7 +155,7 @@ function drawMap3D(samples) {
   let resX = 320
   let resY = 300
   let fov = 100
-  let colWidth = Math.ceil(resX / samples)
+  let colWidth = resX / samples
   let angleStep = fov / samples
   for (let i = 0; i < samples; i++) {
     let rDir = p5.Vector.rotate(dir, radians(-samples/2.0*angleStep + i*angleStep))
@@ -191,7 +191,7 @@ function draw() {
   updatePlayer()
 
   drawMap2D()
-  drawMap3D(300)
+  drawMap3D(20)
   player.draw()
 
   // Draw 3D View boundaries
